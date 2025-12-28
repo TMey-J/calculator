@@ -32,23 +32,28 @@
 
     .display {
         flex: 1;
-        font-size: clamp(36px, 8vw, 52px);
-        text-align: right;
         padding: 20px 10px;
-        color: #7a4a20;
-        overflow-x: auto;
-        display: flex;
-        align-items: flex-end;
-        justify-content: flex-end;
         overflow-x: auto;
         overflow-y: hidden;
         white-space: nowrap;
 
-        scrollbar-width: none; 
+        scrollbar-width: none;
+        touch-action: pan-x;
     }
+
     .display::-webkit-scrollbar {
-        display: none;              /* Chrome, Safari */
+        display: none;
     }
+
+    .display-content {
+        font-size: clamp(36px, 8vw, 52px);
+        color: #7a4a20;
+        text-align: right;
+
+        display: inline-block;
+        min-width: 100%;
+    }
+
     /* Backspace container */
     .top-action {
         display: flex;
@@ -114,7 +119,9 @@
 <body>
 
 <div class="calculator">
-    <div id="display" class="display">0</div>
+   <div class="display" id="display">
+        <div class="display-content" id="displayContent">0</div>
+    </div>
 
     <!-- Backspace button under display -->
     <div class="top-action">
@@ -151,6 +158,7 @@
 
 <script>
     const display = document.getElementById('display');
+    const displayContent = document.getElementById('displayContent');
     let isDragging = false;
     let startX;
     let scrollStart;
@@ -181,43 +189,42 @@
     display.addEventListener('mouseup', () => isDragging = false);
     display.addEventListener('mouseleave', () => isDragging = false);
     function append(value) {
-        if (display.innerText === '0') {
-            display.innerText = value;
+        if (displayContent.innerText === '0') {
+            displayContent.innerText = value;
         } else {
-            display.innerText += value;
+            displayContent.innerText += value;
         }
         scrollToEnd();
     }
 
     function clearDisplay() {
-        display.innerText = '0';
+        displayContent.innerText = '0';
         scrollToEnd();
     }
 
     function backspace() {
-        if (display.innerText.length > 1) {
-            display.innerText = display.innerText.slice(0, -1);
+        if (displayContent.innerText.length > 1) {
+            displayContent.innerText = displayContent.innerText.slice(0, -1);
         } else {
-            display.innerText = '0';
+            displayContent.innerText = '0';
         }
         scrollToEnd();
     }
 
     function calculate() {
         try {
-            display.innerText = eval(display.innerText);
+            displayContent.innerText = eval(displayContent.innerText);
         } catch {
-            display.innerText = 'Error';
+            displayContent.innerText = 'Error';
         }
         scrollToEnd();
     }
 
     function toggleSign() {
-        display.innerText =
-            display.innerText.startsWith('-')
-                ? display.innerText.slice(1)
-                : '-' + display.innerText;
-
+        displayContent.innerText =
+            displayContent.innerText.startsWith('-')
+                ? displayContent.innerText.slice(1)
+                : '-' + displayContent.innerText;
         scrollToEnd();
     }
 
