@@ -40,8 +40,15 @@
         display: flex;
         align-items: flex-end;
         justify-content: flex-end;
-    }
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
 
+        scrollbar-width: none; 
+    }
+    .display::-webkit-scrollbar {
+        display: none;              /* Chrome, Safari */
+    }
     /* Backspace container */
     .top-action {
         display: flex;
@@ -144,17 +151,47 @@
 
 <script>
     const display = document.getElementById('display');
+    let isDragging = false;
+    let startX;
+    let scrollStart;
 
+    display.addEventListener('touchstart', e => {
+        startX = e.touches[0].pageX;
+        scrollStart = display.scrollLeft;
+    });
+
+    display.addEventListener('touchmove', e => {
+        const x = e.touches[0].pageX;
+        const walk = startX - x;
+        display.scrollLeft = scrollStart + walk;
+    });
+
+    display.addEventListener('mousedown', e => {
+        isDragging = true;
+        startX = e.pageX;
+        scrollStart = display.scrollLeft;
+    });
+
+    display.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        const walk = startX - e.pageX;
+        display.scrollLeft = scrollStart + walk;
+    });
+
+    display.addEventListener('mouseup', () => isDragging = false);
+    display.addEventListener('mouseleave', () => isDragging = false);
     function append(value) {
         if (display.innerText === '0') {
             display.innerText = value;
         } else {
             display.innerText += value;
         }
+        scrollToEnd();
     }
 
     function clearDisplay() {
         display.innerText = '0';
+        scrollToEnd();
     }
 
     function backspace() {
@@ -163,6 +200,7 @@
         } else {
             display.innerText = '0';
         }
+        scrollToEnd();
     }
 
     function calculate() {
@@ -171,6 +209,7 @@
         } catch {
             display.innerText = 'Error';
         }
+        scrollToEnd();
     }
 
     function toggleSign() {
@@ -178,7 +217,14 @@
             display.innerText.startsWith('-')
                 ? display.innerText.slice(1)
                 : '-' + display.innerText;
+
+        scrollToEnd();
     }
+
+    function scrollToEnd() {
+        display.scrollLeft = display.scrollWidth;
+    }
+
 </script>
 
 </body>
